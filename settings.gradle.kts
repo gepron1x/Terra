@@ -10,10 +10,10 @@
 rootProject.name = "Terra"
 include("common")
 include("platforms:bukkit")
-include("platforms:fabric")
+// include("platforms:fabric")
 include("platforms:region")
-include("platforms:sponge")
-include("platforms:forge")
+// include("platforms:sponge")
+// include("platforms:forge")
 
 pluginManagement {
     repositories {

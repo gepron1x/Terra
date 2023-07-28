@@ -4,7 +4,9 @@ import com.dfsek.terra.api.TerraPlugin;
 import com.dfsek.terra.api.command.CommandTemplate;
 import com.dfsek.terra.api.command.annotation.Argument;
 import com.dfsek.terra.api.command.annotation.Command;
+import com.dfsek.terra.api.command.annotation.Switch;
 import com.dfsek.terra.api.command.annotation.inject.ArgumentTarget;
+import com.dfsek.terra.api.command.annotation.inject.SwitchTarget;
 import com.dfsek.terra.api.command.annotation.type.DebugCommand;
 import com.dfsek.terra.api.command.annotation.type.PlayerCommand;
 import com.dfsek.terra.api.command.annotation.type.WorldCommand;
@@ -32,11 +34,17 @@ import java.io.IOException;
                         value = "id"
                 )
         },
+        switches = {
+                @Switch("skipair")
+        },
         usage = "/terra structure export <ID>"
 )
 public class StructureExportCommand implements CommandTemplate {
     @Inject
     private TerraPlugin main;
+
+    @SwitchTarget("skipair")
+    private boolean skipAir;
 
     @ArgumentTarget("id")
     private String id;
@@ -52,9 +60,9 @@ public class StructureExportCommand implements CommandTemplate {
 
         StringBuilder scriptBuilder = new StringBuilder("id \"" + id + "\";\nnum y = 0;\n");
 
-        int centerX = 0;
-        int centerY = 0;
-        int centerZ = 0;
+        int centerX = (l1.getBlockX() + l2.getBlockX()) / 2;
+        int centerY = Math.min(l1.getBlockY(), l2.getBlockY());
+        int centerZ = (l1.getBlockZ() + l1.getBlockZ()) / 2;
 
         for(int x = l1.getBlockX(); x <= l2.getBlockX(); x++) {
             for(int y = l1.getBlockY(); y <= l2.getBlockY(); y++) {
@@ -87,6 +95,7 @@ public class StructureExportCommand implements CommandTemplate {
                             data = main.getWorldHandle().createBlockData(sign.getLine(2) + sign.getLine(3));
                         }
                     }
+                    if(skipAir && data.isAir()) continue;;
                     if(!data.isStructureVoid()) {
                         scriptBuilder.append("block(").append(x - l1.getBlockX() - centerX).append(", y + ").append(y - l1.getBlockY() - centerY).append(", ").append(z - l1.getBlockZ() - centerZ).append(", ")
                                 .append("\"");
